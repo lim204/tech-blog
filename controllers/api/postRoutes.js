@@ -9,27 +9,24 @@ router.post('/', withAuth, async (req, res) => {
     console.log(body);
 
     try {
-        const newPost = await Post.create({
-            ...body,
-            userId: req.session.userId
-        });
+        const newPost = await Post.create({...body,userId: req.session.userId});
         res.json(newPost)
     } catch (err) {
-        console.log('Ooops failed', err);
+        console.log('Ooops It failed', err);
         res.status(500).json(err);
     }
 });
 // update Post
 router.put('/:id', withAuth, async (req, res) => {
     try {
-        console.log(req.body);
-        const [affectedRow] = await Post.update(req.body, {
+        console.log('here is the req.body', req.body);
+        const [affectedRows] = await Post.update(req.body, {
             where: {
                 id: req.params.id,
             }
         })
 
-        if (affectedRow > 0) {
+        if (affectedRows > 0) {
             res.status(200).end ();
         }else{
             res.status(404).end();
@@ -40,15 +37,15 @@ router.put('/:id', withAuth, async (req, res) => {
 });
 
 // deleating post
-router.delete('/', withAuth, async (req, res) => {
+router.delete('/:id', withAuth, async (req, res) => {
     try {
-        const [affectedRow] = Post.destroy({
+        const [affectedRows] = Post.destroy({
            where:{
             id:req.params.id,
            }  
         });
         
-        if (affectedRow > 0) {
+        if (affectedRows > 0) {
             res.status(200).end ();
         }else{
             res.status(404).end();

@@ -5,7 +5,7 @@ const withAuth = require ('../../utils/auth');
 router.get ('/',withAuth, async (req,res)=> {
     try{
         const commentData = await Comment.findAll({
-            include:[user],
+            include:[User],
         });
         const comments = commentData.map((comment) => comment.get({ plain: true }));
 
@@ -17,7 +17,7 @@ router.get ('/',withAuth, async (req,res)=> {
     }
 });
 
-router.get ('/',withAuth, async (req,res)=> {
+router.post ('/',withAuth, async (req,res)=> {
     const body =req.body;
 
     try{

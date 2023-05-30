@@ -9,7 +9,7 @@ router.get ('/', async (req,res)=> {
             password:req.body.password
         });
        req.session.save(()=>{
-        req.session.userId = newUser.Id;
+        req.session.userId = newUser.id;
         req.session.username = newUser.username;
         req.session.loggedIn = true;
 
@@ -29,22 +29,22 @@ router.post ('/login', async (req,res)=> {
          },
         });
         if (!user){
-            res.status(400).json({message:'user account not found'});
+            res.status(400).json({message:'user account not found!'});
             return;
         }
 
         const validPassword = user.checkPassword(req.body.password);
         if (!validPassword){
-            res.status(400).json({message:'user account not found'});
+            res.status(400).json({message:'incorrect password or account not found!'});
             return;
         }
 
        req.session.save(()=>{
-        req.session.userId = newUser.Id;
-        req.session.username = newUser.username;
+        req.session.userId = user.id;
+        req.session.username = user.username;
         req.session.loggedIn = true;
 
-        res.json({user,message:'logged in!'});
+        res.json({user,message:'Yay, you are now logged in!'});
        });
     }catch (err){
         res.status (400).json({message:'Account not found!'});

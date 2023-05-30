@@ -17,15 +17,9 @@ router.get('/', async (req, res) => {
         res.status(500).json(err);
     }
 });
-// 
-router.get('/new', withAuth, (req, res) => {
-    res.render('new-post', {
-        layout: 'dashboard',
-    });
-});
 
 // getting single post
-router.get('/edit/:id', withAuth, async (req, res) => {
+router.get('/post/:id', withAuth, async (req, res) => {
     try {
         const postData = await Post.findOne({
             where:{id:req.params.id},
