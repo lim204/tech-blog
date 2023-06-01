@@ -1,34 +1,66 @@
-const router = require ('express').Router();
-const {Comment} = require ('../../models');
-const withAuth = require ('../../utils/auth');
+const router = require('express').Router();
+const { Comment } = require('../../models');
+const withAuth = require ('../../utils/helpers')
 
-router.get ('/',withAuth, async (req,res)=> {
-    try{
-        const commentData = await Comment.findAll({
-            include:[User],
-        });
-        const comments = commentData.map((comment) => comment.get({ plain: true }));
-
-        console.log (comments);
-
-        res.render ('single-post',{comments, logggIn: req.session.loggIn});
-    }catch (err){
-        res.status (500).json(err);
+// loging new user
+router.post('/login', async (req, res) => {
+  try {
+    const userData = await User.findOne({
+      where: { username: req.body.username, }
+    });
+    if (!userData) {
+      res.status(400).json({ message: 'Account not found. Please try again!' });
+      return;
     }
+
+    const validPassword = userData.comparePassword(req.body.password)
+    if (!validPassword){
+      res.status(400).json({message:'password is invalid, please try again!'})
+      return
+    }
+
+    req.session.save(() => {
+      req.session.userId = userData.id
+      req.session.userName = userData.username
+      req.session.loggedIn = true;
+
+      res.json({ userData, message: 'You have logged in' })
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: 'Account not found!' });
+  }
 });
 
-router.post ('/',withAuth, async (req,res)=> {
-    const body =req.body;
+// creating a new user
+router.post('/register', async (req, res) => {
+  try {
+    const registerUser = await User.create(req.body)
+    // saving user data to session storage in DB
+    req.session.save(() => {
+      req.session.userId = registerUser.id
+      req.session.username = registerUser.username
+      req.session.loggedIn = true
 
-    try{
-        const newComment = await Comment.create({
-            ...body,
-            userId: req.session.userId
-        });
-        res.json(newComment)
-    }catch (err){
-        res.status (500).json(err);
-    }
+      res.json({
+        registerUser,
+        message: `${registerUser.username} Account has been created!`,
+      })
+    })
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
+
+// Logout
+router.post('/logout', (req, res) => {
+  if (req.session.loggedIn) {
+    req.session.destroy(() => {
+      res.status(204).end();
+    });
+  } else {
+    res.status(404).end();
+  }
 });
 
 module.exports = router;
