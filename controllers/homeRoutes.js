@@ -1,33 +1,32 @@
 const router = require('express').Router();
-const { User, Post } = require('../models/index');
+const { User, Post, Comment} = require('../models');
 // Import the custom middleware
 const withAuth = require('../utils/auth');
 
 // GET all blog posts to display on homepage
-router.get('/', async (req, res) => {
-  try {
-    const blogPostData = await Post.findAll({
-      include: [User],
-    });
+// router.get('/', async (req, res) => {
+//   try {
+//     const PostData = await Post.findAll({
+//       include: [User],
+//     });
+//     const posts = PostData.map((post)=> post.get({plain:true}));
 
-    const serializedPost = blogPostData.map((data) =>
-      data.get({ plain: true })
-    );
-
-    res.render('displayAllPost', {
-      serializedPost
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
-});
+//     res.render('all-posts-admin', {
+//       posts,
+//       loggedIn:req.session.loggedIn
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json(err);
+//   }
+// });
 
 // GET single post
 // Use the custom middleware before allowing the user to access the gallery
-router.get('/post/:id', async (req, res) => {
+router.get('/post/:id', withAuth, async (req, res) => {
   try {
-    const postData = await Post.findByPk(req.params.id, {
+    const postData = await Post.findOne({
+      where: {id:req.params.id},
       include: [
         User,
         {
@@ -39,9 +38,10 @@ router.get('/post/:id', async (req, res) => {
 
     if (postData) {
       const post = postData.get({ plain: true })
-      res.render('single-post', { post })
+      console.log (post);
+      res.render('single-post', { post, loggedIn:req.session.loggedIn});
     } else {
-      res.status(400).end()
+      res.status(404).end()
     }
     } catch(err) {
       res.status(500).json(err)
@@ -50,20 +50,20 @@ router.get('/post/:id', async (req, res) => {
 
 router.get('/login', (req, res) => {
     if (req.session.loggedIn) {
-      res.redirect('/');
+      res.redirect('/dashboard');
       return;
     }
 
     res.render('login');
   });
 
-  router.get('/register', (req, res) => {
+  router.get('/signup', (req, res) => {
     if (req.session.loggedIn) {
-      res.redirect('/');
+      res.redirect('/dashboard');
       return;
     }
 
-    res.render('register');
+    res.render('signup');
   });
 
   module.exports = router;

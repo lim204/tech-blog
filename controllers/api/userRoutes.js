@@ -1,53 +1,56 @@
 const router = require('express').Router();
 const { User } = require('../../models');
 
-// loging new user
-router.post('/login', async (req, res) => {
+// signing up  new user
+router.post('/', async (req, res) => {
   try {
-    const userData = await User.findOne({
-      where: { username: req.body.username, }
+    const newUser = await User.create({
+        username: req.body.username, 
+        password: req.body.password
     });
-    if (!userData) {
-      res.status(400).json({ message: 'Account not found. Please try again!' });
-      return;
-    }
-
-    const validPassword = userData.comparePassword(req.body.password)
-    if (!validPassword){
-      res.status(400).json({message:'password is invalid, please try again!'})
-      return
-    }
-
-    req.session.save(() => {
-      req.session.userId = userData.id
-      req.session.userName = userData.username
+      // saving user data to session storage in DB
+      req.session.save(() => {
+      req.session.userId = newUser.id;
+      req.session.userName = newUser.username;
       req.session.loggedIn = true;
 
-      res.json({ userData, message: 'You have logged in' })
+      res.json({ newUser, message: 'You have created an account' })
     });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: 'Account not found!' });
+    res.status(400).json(err);
   }
 });
 
-// creating a new user
-router.post('/register', async (req, res) => {
+// loging in 
+router.post('/login', async (req, res) => {
   try {
-    const registerUser = await User.create(req.body)
-    // saving user data to session storage in DB
+    const user = await User.findOne({
+      username: req.body.username,
+    }) 
+    if (!user){
+      res.status(400).json({
+        message: 'Account not found!',
+      });
+      return;
+    }
+    const validPassword  = user.checkPassword(req.body.password);
+    if (!validPassword){
+      res.status(400).json({message:'Invalid password!'});
+      return;
+    };
     req.session.save(() => {
-      req.session.userId = registerUser.id
-      req.session.username = registerUser.username
-      req.session.loggedIn = true
+      req.session.userId = user.id;
+      req.session.username = user.username;
+      req.session.loggedIn = true;
 
       res.json({
-        registerUser,
-        message: `${registerUser.username} Account has been created!`,
+        user,
+        message:'You have logged in!' ,
       })
     })
   } catch (err) {
-    res.status(500).json(err)
+    res.status(400).json({message:'User account not found!'})
   }
 })
 

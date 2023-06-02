@@ -1,43 +1,44 @@
-const dashboardRouter = require('express').Router();
-const { Post } = require('../models');
+const router = require('express').Router();
+const { Post, User } = require('../models');
 // Import the custom middleware
 const withAuth = require('../utils/auth');
 
-
-dashboardRouter.get('/', withAuth, async (req, res) => {
+// all posts dashboard
+router.get('/', withAuth, async (req, res) => {
     try {
         const postData = await Post.findAll({
             where: {
                 userId: req.session.userId,
             },
         })
-        const blogPosts = postData.map((post) => post.get({ plain: true }))
-        res.render('displayAllPostAdmin', {
+        const posts = postData.map((post) => post.get({ plain: true }))
+        console.log(posts);
+        res.render('all-posts', {
             layout: 'dashboard',
-            blogPosts,
+            posts,
         })
     } catch (err) {
         res.redirect('login')
     }
 })
 // showing new post
-dashboardRouter.get('/new', withAuth, (req, res) => {
-    res.render('newPost', {
+router.get('/new', withAuth, (req, res) => {
+    res.render('new-post', {
       layout: 'dashboard',
-    })
-  })
+    });
+  });
 
 // edith a post page
-dashboardRouter.get('/edit/:id', withAuth, async (req, res) => {
+router.get('/edit/:id', withAuth, async (req, res) => {
     try {
-        const postData = await BlogPost.findByPk(req.params.id);
+        const postData = await Post.findByPk(req.params.id);
 
         if (postData) {
-            const blogPost = postData.get({ plain: true })
+            const post = postData.get({ plain: true })
 
             res.render('edit-post', {
                 layout: 'dashboard',
-                blogPost,
+                post,
             })
         } else {
             res.status(404).end()
@@ -47,4 +48,4 @@ dashboardRouter.get('/edit/:id', withAuth, async (req, res) => {
     }
 });
 
-module.exports = dashboardRouter;
+module.exports = router;
