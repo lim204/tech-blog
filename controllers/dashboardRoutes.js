@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Post, User } = require('../models');
+const { Post } = require('../models');
 // Import the custom middleware
 const withAuth = require('../utils/auth');
 
@@ -13,7 +13,7 @@ router.get('/', withAuth, async (req, res) => {
         })
         const posts = postData.map((post) => post.get({ plain: true }))
         console.log(posts);
-        res.render('all-posts', {
+        res.render('userpost', {
             layout: 'dashboard',
             posts,
         })

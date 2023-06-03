@@ -5,13 +5,13 @@ const { User } = require('../../models');
 router.post('/', async (req, res) => {
   try {
     const newUser = await User.create({
-        username: req.body.username, 
+        name: req.body.name, 
         password: req.body.password
     });
       // saving user data to session storage in DB
       req.session.save(() => {
       req.session.userId = newUser.id;
-      req.session.userName = newUser.username;
+      req.session.userName = newUser.name;
       req.session.loggedIn = true;
 
       res.json({ newUser, message: 'You have created an account' })
@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const user = await User.findOne({
-      username: req.body.username,
+      name: req.body.name,
     }) 
     if (!user){
       res.status(400).json({
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
     };
     req.session.save(() => {
       req.session.userId = user.id;
-      req.session.username = user.username;
+      req.session.username = user.name;
       req.session.loggedIn = true;
 
       res.json({

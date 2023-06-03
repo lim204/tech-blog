@@ -9,7 +9,7 @@ router.get('/', withAuth, async (req, res) => {
       include: [User],
     });
     // Serialize db
-    const comments =commentData.map((comment)=> comment.get({plain:true}));
+    const comments = commentData.map((comment)=> comment.get({plain:true}));
     console.log(comments);
     res.render('single-post', {comments,loggedIn:req.session.loggedIn});
   } catch (err) {

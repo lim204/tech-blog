@@ -18,7 +18,7 @@ router.get('/', withAuth, async (req, res) => {
     }
 });
 
-// updated single kexisting blog post
+// update post
 router.put('/:id', withAuth, async (req, res) => {
     try {
         const [affectedRows] = await Post.update(req.body,{

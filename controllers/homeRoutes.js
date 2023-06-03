@@ -4,22 +4,22 @@ const { User, Post, Comment} = require('../models');
 const withAuth = require('../utils/auth');
 
 // GET all blog posts to display on homepage
-// router.get('/', async (req, res) => {
-//   try {
-//     const PostData = await Post.findAll({
-//       include: [User],
-//     });
-//     const posts = PostData.map((post)=> post.get({plain:true}));
+router.get('/', async (req, res) => {
+  try {
+    const PostData = await Post.findAll({
+      include: [User],
+    });
+    const posts = PostData.map((post)=> post.get({plain:true}));
 
-//     res.render('all-posts-admin', {
-//       posts,
-//       loggedIn:req.session.loggedIn
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json(err);
-//   }
-// });
+    res.render('homepage', {
+      posts,
+      loggedIn:req.session.loggedIn
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
 
 // GET single post
 // Use the custom middleware before allowing the user to access the gallery
