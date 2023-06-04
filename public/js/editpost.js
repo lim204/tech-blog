@@ -1,8 +1,8 @@
 const editFormHandler = async (event) => {
     event.preventDefault();
   
-    const title = document.querySelector('input[name="post-title]'();
-    const post
+    const title = document.querySelector('input[name="post-title]'());
+   
   
     if (email && password) {
       const response = await fetch('/api/users/login', {
