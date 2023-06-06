@@ -8,7 +8,7 @@ router.get('/', withAuth, async (req, res) => {
     try {
         const postData = await Post.findAll({
             where: {
-                userId: req.session.userId,
+                user_id: req.session.userId,
             },
         })
         const posts = postData.map((post) => post.get({ plain: true }))
@@ -18,7 +18,8 @@ router.get('/', withAuth, async (req, res) => {
             posts,
         })
     } catch (err) {
-        res.redirect('login')
+        console.log(err);
+        res.json({err});
     }
 })
 // showing new post
