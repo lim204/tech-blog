@@ -8,7 +8,7 @@ router.get('/', withAuth, async (req, res) => {
     try {
         const postData = await Post.findAll({
             where: {
-                user_id: req.session.userId,
+                userId: req.session.userId,
             },
         })
         const posts = postData.map((post) => post.get({ plain: true }))
@@ -26,6 +26,7 @@ router.get('/', withAuth, async (req, res) => {
 // router.get('/new', withAuth, (req, res) => {
 //     res.render('new-post', {
 //       layout: 'dashboard',
+//       posts,
 //     });
 //   });
 
